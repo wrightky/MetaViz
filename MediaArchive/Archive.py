@@ -9,7 +9,7 @@ import subprocess
 import re
 import .config as cf
 
-class Collection():
+class Archive():
     """Parent class for the media collection"""
     def __init__(self):
         # Store details on collection location
