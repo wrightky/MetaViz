@@ -9,17 +9,35 @@ import os
 # Input information on your archive
 #---------------------------------------------------------
 # Absolute path to the media collection
-CollectionPath = r'/Pictures/AllPhotos_GroupedByDate'
+CollectionPath = r'/Users/mickeylanning/Pictures/AllPhotos_GroupedByDate'
 
 # Absolute path of location to save CSV files
-csvPath = r'/Pictures/Metadata'
+csvPath = r'/Users/mickeylanning/Pictures/Metadata'
 
 # List of any folders inside collection to exclude from processing
 ExcludeFolders = ['Images']
 
+# Metadata fields of interest, list or None
+# Decides the order and header of columns in CSVs
+fields = ['SourceFile',
+          'XMP-dc:Title',
+          'XMP-dc:Description',
+          'XMP-dc:Coverage',
+          'XMP-dc:Subject',
+          'CreateDate',
+          'XMP-dc:Creator',
+          'FileModifyDate',
+          'XMP-digiKam:ImageHistory',
+          'XMP-acdsee:Notes',
+          'XMP-dc:Source']
+
 #---------------------------------------------------------
 # Grabbing additional information
 #---------------------------------------------------------
+if fields is not None:
+    # Shorthand for metadata fields
+    fields_short = [f.split(':')[-1] for f in fields]
+
 # Create CSV path if it doesn't exist yet
 if not os.path.exists(csvPath):
     os.makedirs(csvPath)
@@ -28,7 +46,7 @@ if not os.path.exists(csvPath):
 subfolders = [x[0] for x in os.walk(CollectionPath)]
 for ex_fold in ExcludeFolders:
     subfolders = [s for s in subfolders if ex_fold not in s]
-subfolders = [s.replace(CollectionPath,'') for s in subfolders[1:]]
+subfolders = [s.replace(CollectionPath,'')[1:] for s in subfolders[1:]]
 
 # Check which tertiary plotting packages are available
 try:

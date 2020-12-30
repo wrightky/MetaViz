@@ -1,4 +1,6 @@
 __version__ = "0.0.0"
 
 from . import config
-from . import Archive
+from . import archive
+
+Archive = archive.Archive()
