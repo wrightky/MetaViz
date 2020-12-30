@@ -65,22 +65,22 @@ ipython_config.py
 .python-version
 
 # Media Files
-.png
-.jpeg
-.jpg
-.mov
-.tif
-.mp3
-.mp4
-.mpeg
-.3gp
-.3g2
-.heic
-.wmv
-.avi
+*.png
+*.jpeg
+*.jpg
+*.mov
+*.tif
+*.mp3
+*.mp4
+*.mpeg
+*.3gp
+*.3g2
+*.heic
+*.wmv
+*.avi
 
 # Other temporary exclusions
-.DS_Store
-.csv
-.zip
-.ipynb
+*.DS_Store
+*.csv
+*.zip
+*.ipynb
