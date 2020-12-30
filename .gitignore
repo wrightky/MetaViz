@@ -80,6 +80,7 @@ ipython_config.py
 .avi
 
 # Other temporary exclusions
+.DS_Store
 .csv
 .zip
 .ipynb
