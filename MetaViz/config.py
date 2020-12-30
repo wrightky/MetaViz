@@ -25,9 +25,10 @@ if not os.path.exists(csvPath):
     os.makedirs(csvPath)
 
 # Grab all sub-directory names, excluding any specified above
-subfolders = [f.path for f in os.scandir(CollectionPath) if f.is_dir()]
-for ex_fold in ExludeFolders:
+subfolders = [x[0] for x in os.walk(CollectionPath)]
+for ex_fold in ExcludeFolders:
     subfolders = [s for s in subfolders if ex_fold not in s]
+subfolders = [s.replace(CollectionPath,'') for s in subfolders[1:]]
 
 # Check which tertiary plotting packages are available
 try:
