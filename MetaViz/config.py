@@ -11,11 +11,14 @@ import os
 # Absolute path to the media collection
 CollectionPath = r'/Users/mickeylanning/Pictures/AllMediaArchive'
 
+# List of any folders inside collection to exclude from processing
+ExcludeFolders = ['Images']
+
 # Absolute path of location to save CSV files
 csvPath = r'/Users/mickeylanning/Pictures/Metadata'
 
-# List of any folders inside collection to exclude from processing
-ExcludeFolders = ['Images']
+# Absolute path of location to create backup zip archive
+BackupPath = r'/Users/mickeylanning/Pictures/Backup'
 
 # Metadata fields of interest, list or None
 # Decides the order and header of columns in CSVs
