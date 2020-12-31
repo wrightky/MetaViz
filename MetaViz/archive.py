@@ -5,7 +5,6 @@ Establish main class for the photo archive/collection
 import numpy as np
 import pandas as pd
 import os
-import subprocess
 import re
 from . import config as cf
 
@@ -19,21 +18,25 @@ class Archive():
         self.fields = cf.fields
         self.fields_short = cf.fields_short
         
+        # Set verbose flag for function printing
+        self.verbose = cf.verbose
+        
         # Information on packages
         self.SeabornAvailable = cf.SeabornAvailable
         self.ChordAvailable = cf.ChordAvailable
         self.NetworkXAvailable = cf.NetworkXAvailable
     
     def UpdateCSV(self, subfolders=None):
-        """For a given list of subfolders, loop through and update the
+        """
+        For a given list of subfolders, loop through and update the
         exiftool csv for that year. Must be called before later functions
         in this script.
 
         Inputs:
             subfolders (list) : subfolders to update, default is all
         Outputs:
-            outputs (list) : outputs from the subprocess exiftool call
-            Saves new csv files for specified folders in csvPath"""
+            Saves new csv files for specified folders in csvPath
+        """
 
         # Check input
         if subfolders is None:
@@ -41,20 +44,17 @@ class Archive():
         elif not isinstance(subfolders, list):
             subfolders = [subfolders]
 
-        outputs = []
         for sf in subfolders:
             # Grab absolute path of this subfolder
             foldername = os.path.join(self.CollectionPath, sf)
 
             # Create a name for csv preserving dir structure
-            if os.sep in sf:
-                csvname = sf.replace(os.sep,'__')
-            csvname = os.path.join(self.csvPath, csvname + '.csv')
+            csvname = os.path.join(self.csvPath,
+                                   sf.replace(os.sep,'__') + '.csv')
 
             # Run exiftool through bash shell command
             bashcmd = ('exiftool -csv %s > %s' % (foldername, csvname))
-            output = subprocess.check_output(bashcmd, shell=True) # Run
-            outputs.append(output)
+            os.system(bashcmd) # Run
 
             # Filter/rename columns based on fields in config
             if self.fields is not None:
@@ -74,5 +74,51 @@ class Archive():
                 # Save new
                 df2.to_csv(csvname, index=False, encoding="ISO-8859-1")
 
-            print('Updated csv for %s' % sf)
-        return outputs
+            if self.verbose:
+                print('Updated csv for %s' % sf)
+        return
+
+    def UpdateMetadata(self, subfolders=None):
+        """
+        For a given list of subfolders, loop through and update
+        the metadata in the files of that folder to match the CSV
+        using the exiftool update from csv command.
+
+        **WARNING**: Dangerous function, directly modifies files
+        in archive. Make sure to keep backups!
+
+        Inputs:
+            subfolders (list) : subfolders in which to update
+                                files, default is all
+        Outputs:
+            Saves csv metadata into media files
+        """
+
+        # Check input
+        if subfolders is None:
+            subfolders = self.subfolders
+        elif not isinstance(subfolders, list):
+            subfolders = [subfolders]
+        
+        # Warn users to keep backups
+        if self.verbose:
+            print('Warning: Function directly modifies file metadata.\n'\
+                   +'Make sure to keep a backup!')
+
+        # Update metadata
+        for sf in subfolders:
+            # Grab absolute path of this subfolder
+            foldername = os.path.join(self.CollectionPath, sf)
+
+            # Recreate csv name from dir structure
+            csvname = os.path.join(self.csvPath,
+                                   sf.replace(os.sep,'__') + '.csv')
+
+            # Run exiftool through bash shell command
+            bashcmd = ('exiftool -csv=%s %s -overwrite_original_in_place -P -F'\
+                       % (csvname, foldername))
+            os.system(bashcmd) # Run
+
+            if self.verbose:
+                print('Updated photos in %s' % sf)
+        return

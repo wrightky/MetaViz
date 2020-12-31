@@ -9,7 +9,7 @@ import os
 # Input information on your archive
 #---------------------------------------------------------
 # Absolute path to the media collection
-CollectionPath = r'/Users/mickeylanning/Pictures/AllPhotos_GroupedByDate'
+CollectionPath = r'/Users/mickeylanning/Pictures/AllMediaArchive'
 
 # Absolute path of location to save CSV files
 csvPath = r'/Users/mickeylanning/Pictures/Metadata'
@@ -30,6 +30,9 @@ fields = ['SourceFile',
           'XMP-digiKam:ImageHistory',
           'XMP-acdsee:Notes',
           'XMP-dc:Source']
+
+# Set global verbose flag for printed function outputs
+verbose = True
 
 #---------------------------------------------------------
 # Grabbing additional information
