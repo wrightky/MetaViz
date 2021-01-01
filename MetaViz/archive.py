@@ -167,3 +167,151 @@ class Archive():
                 print('Zipping ' + sf)
             shutil.make_archive(backupname, format, foldername)
         return
+
+
+    def FindSource(self, searchterms, fields=None,
+                   subfolders=None, include_all=False,
+                   withPath=False):
+        """
+        For a given list of search terms, will return
+        the filenames for files in which those terms appear
+        in the specified metadata fields.
+
+        Inputs:
+            searchterms (list) : Terms for which to search.
+                            Expects whole words!
+            fields (list) : Metadata fields in which to look.
+                            Shorthand expected. Default searches
+                            through all in config.fields_short.
+            subfolders (list) : Subfolders in which to search,
+                            default is all
+            include_all (bool) : Returns union of terms if False,
+                            intersection if True.
+                            Note: Intersection only works
+                            inside a single field.
+                            For comprehensive intersection,
+                            use IntersectLists()
+            withPath (bool) : Returns just filenames if False,
+                            returns full path if true
+        Outputs:
+            FileNames (list) : List of file names containing terms
+        """
+        # Handle inputs
+        if not isinstance(searchterms, list):
+            searchterms = [searchterms]
+        if fields is None:
+            fields = self.fields_short
+        if subfolders is None:
+            subfolders = self.subfolders
+
+        # Check if any searchterms either start or end in wildcards
+        wildcard_border = False
+        for term in searchterms:
+            if (term[0] in '\/.*(),$^|?+') or (term[-1] in '\/.*(),$^|?+'):
+                wildcard_border = True
+        if wildcard_border and (len(searchterms) > 1):
+            print('Multiple-term search does not work'\
+                  + ' with wildcard-bordered terms')
+            return []
+
+        FileNames = []
+        for sf in subfolders:
+            # Recreate csv name from dir structure
+            csvname = os.path.join(self.csvPath,
+                                   sf.replace(os.sep,'__') + '.csv')
+            # Read in csv
+            df = pd.read_csv(csvname, encoding = "ISO-8859-1",
+                             low_memory=False)
+
+            # Loop through fields of interest:
+            for jj in fields:
+                # Find column name from shorthand
+                xmp_col = [col for col in df.columns \
+                           if jj == col.split(':')[-1]]
+                # Skip if field not in csv
+                if len(xmp_col) < 1:
+                    continue
+                else:
+                    xmp_col = xmp_col[0]
+
+                if len(searchterms) == 1:
+                    # Check for special wildcards around edges of term
+                    if wildcard_border:
+                        # Create sub-df containing string,
+                        # get sourcefile, make list
+                        subdf = df[df[xmp_col].str.contains(searchterms[0],
+                                                            regex=False, 
+                                                            na=False)]
+                        subdf = subdf['SourceFile'].values.tolist()
+                    else:    
+                        # If no wildcards, use regex to match whole words
+                        term = r'\b%s\b' % re.escape(searchterms[0])
+                        subdf = df[df[xmp_col].str.contains(term,
+                                                            regex=True,
+                                                            na=False)]
+                        subdf = subdf['SourceFile'].values.tolist()
+                    FileNames.extend(subdf)
+                else:
+                    # If multiple terms, use regex expression
+                    # with either "and" or "or" operator
+                    if include_all:
+                        andterms = []
+                        for term in searchterms:
+                            andterms.append(r'(?=.*\b%s\b)' % re.escape(term))
+                        subdf = df[df[xmp_col].str.contains(''.join(s for s in andterms),
+                                                            na=False)]
+                        subdf = subdf['SourceFile'].values.tolist()
+                        FileNames.extend(subdf)
+                    else:
+                        term = ('|'.join(r'\b%s\b' % re.escape(s) for s in searchterms))
+                        subdf = df[df[xmp_col].str.contains(term, na=False)]
+                        subdf = subdf['SourceFile'].values.tolist()
+                        FileNames.extend(subdf)
+
+        # Remove duplicates if there are any
+        FileNames = list(dict.fromkeys(FileNames))
+        # Re-sort if necessary
+        FileNames = sorted(FileNames)
+        # If we don't want full path, grab just filenames
+        if withPath is False:
+            FileNames = [f.split(os.sep)[-1] for f in FileNames]
+        return FileNames
+
+
+    def IntersectLists(self, entries):
+        """
+        Find intersection of input lists. Useful for 
+        existing lists or complex searches.
+        
+        Inputs:
+            entries (list) : list of lists to intersect [[...],[...]]
+        Outputs:
+            intersection (list) : intersection of all entry lists
+        """
+        for ii in list(range(len(entries)-1)):
+            if ii == 0:
+                entryset = set(entries[0])
+            else:
+                entryset = set(intersection)
+            intersection = list(entryset.intersection(entries[ii+1]))
+        # Re-sort if necessary
+        intersection = sorted(intersection)
+        return intersection
+
+
+    def DifferenceLists(self, entries):
+        """
+        Find difference of one list with another.
+        Useful for existing lists or complex searches.
+        
+        Inputs:
+            entries (list) : list of two lists to difference [[...],[...]]
+        Outputs:
+            diff (list) : difference of all entry lists
+        """
+        if len(entries) > 2:
+            raise ValueError('Symmetric difference only works on two lists')
+        entryset = set(entries[0])
+        diff = list(entryset.symmetric_difference(entries[1]))
+        diff = sorted(diff) # Re-sort if necessary
+        return diff
