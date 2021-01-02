@@ -124,7 +124,7 @@ class Archive():
             os.system(bashcmd) # Run
 
             if self.verbose:
-                print('Updated photos in %s' % sf)
+                print('Updated metadata in %s' % sf)
         return
 
 
@@ -318,8 +318,8 @@ class Archive():
         diff = list(entryset.symmetric_difference(entries[1]))
         diff = sorted(diff) # Re-sort if necessary
         return diff
-    
-    
+
+
     def GrabData(self, sourcefiles=None, fields=None,
                  startdate=None, enddate=None,
                  withPath=False):
@@ -390,3 +390,53 @@ class Archive():
 
         df.reset_index(drop=True, inplace=True)
         return df
+
+
+    def CountUnique(self, series, delimiter=', '):
+        """
+        Count unique entries in a column of a pandas series.
+        Returns a new DataFrame with unique labels and
+        their appearance count.
+        
+        Inputs:
+            series (pandas series) : Column of a dataframe,
+                    e.g. df['A']
+            delimiter (str) : String delimiter used to
+                    separate entries in column of interest.
+        Outputs:
+            uq (pandas DataFrame) : New dataframe containing
+                    all unique entries and their appearance
+                    counts, sorted by appearance.
+        """
+        # Narrow down to unique rows
+        entries = series.unique().tolist()
+        # Remove nan if necessary
+        entries = [x for x in entries if str(x) != 'nan']
+        # Join these all into one string
+        unique_entries = delimiter.join(name for name in entries)
+        # Break string into list at delimiter
+        unique_list = unique_entries.split(delimiter)
+        unique_list = list(filter(None, unique_list))
+        # Remove duplicates
+        unique_list = list(dict.fromkeys(unique_list))
+
+        # Create new DataFrame
+        uq = pd.DataFrame(unique_list, columns=['Entry'])
+        # Count appearances of each entry in original dataframe
+        uq['Count'] = uq.apply(lambda row: \
+                               np.nansum(series.str.count(\
+                               r'%s' % re.escape(row['Entry'])).values),
+                               axis=1)
+        # Now fix double-counting of entries contained
+        # inside other entries
+        for ii in uq.index:
+            thisname = uq['Entry'][ii]
+            for jj in uq.index:
+                thatname = uq['Entry'][jj]
+                if (thisname in thatname) & (thisname != thatname):
+                    uq.loc[ii,'Count'] = uq['Count'][ii] \
+                                         - uq['Count'][jj]
+
+        uq = uq.sort_values('Count', ascending=False)
+        uq.reset_index(drop=True, inplace=True)
+        return uq
