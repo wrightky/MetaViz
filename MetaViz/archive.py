@@ -93,7 +93,7 @@ class Archive():
 
         Inputs:
             subfolders (list) : subfolders in which to update
-                                files, default is all
+                    files, default is all
         Outputs:
             Saves csv metadata into media files
         """
@@ -135,11 +135,10 @@ class Archive():
 
         Inputs:
             subfolders (list) : subfolders to backup, default
-                                is all, stored in containers one
-                                subdirectory below CollectionPath
+                    is all, stored in containers one subdirectory
+                    below CollectionPath
             format (str) : compression type to use with
-                           shutil.make_archive(), e.g. 'zip',
-                           'tar', 'gztar'
+                    shutil.make_archive(), e.g. 'zip', 'tar', 'gztar'
         Outputs:
             Saves a zip backup of the specified subfolders
         """
@@ -175,24 +174,28 @@ class Archive():
         """
         For a given list of search terms, will return
         the filenames for files in which those terms appear
-        in the specified metadata fields.
+        in the specified metadata fields. Can choose which
+        fields and folders in which to look.
+        
+        **NOTE** Intersection only works inside a single
+        field, and does not behave well with wildcards. For
+        reliable intersection, use multiple single-term
+        searches with IntersectLists()
 
         Inputs:
             searchterms (list) : Terms for which to search.
-                            Expects whole words!
+                    Expects whole words!
             fields (list) : Metadata fields in which to look.
-                            Shorthand expected. Default searches
-                            through all in config.fields_short.
+                    Shorthand expected. Default searches through
+                    all in config.fields_short.
             subfolders (list) : Subfolders in which to search,
-                            default is all
+                    default is all
             include_all (bool) : Returns union of terms if False,
-                            intersection if True.
-                            Note: Intersection only works
-                            inside a single field.
-                            For comprehensive intersection,
-                            use IntersectLists()
+                    intersection if True. NOTE: Intersection only
+                    works inside a single field. For comprehensive
+                    intersection, use IntersectLists()
             withPath (bool) : Returns just filenames if False,
-                            returns full path if true
+                    returns full path if true
         Outputs:
             FileNames (list) : List of file names containing terms
         """
@@ -315,3 +318,75 @@ class Archive():
         diff = list(entryset.symmetric_difference(entries[1]))
         diff = sorted(diff) # Re-sort if necessary
         return diff
+    
+    
+    def GrabData(self, sourcefiles=None, fields=None,
+                 startdate=None, enddate=None,
+                 withPath=False):
+        """
+        Function will grab any metadata of interest for the
+        specified list of files and return a pandas DataFrame.
+        By default, returns all metadata in archive.
+        
+        Inputs:
+            sourcefiles (list) : Files for which we want metadata.
+                    Default is None, which will return everything.
+            fields (list) : Metadata fields to return in DataFrame.
+                    If None specified, returns default options.
+            startdate (str) : Datetime (YYYYmmdd_HHMMSS) after which
+                    to return data.
+            enddate (str) : Datetime (YYYYmmdd_HHMMSS) before which
+                    to return data.
+            withPath (bool) : Returns just filenames in SourceFile
+                    if False, returns full path if true
+        Outputs:
+            data (pandas DataFrame) : Dataframe of requested metadata.
+        """
+        # Load all metadata into dataframe
+        frame = []
+        for sf in self.subfolders:
+            # Recreate csv name from dir structure
+            csvname = os.path.join(self.csvPath,
+                                   sf.replace(os.sep,'__') + '.csv')
+            # Read in csv
+            df = pd.read_csv(csvname, encoding = "ISO-8859-1",
+                             low_memory=False)
+            frame.append(df)
+        df = pd.concat(frame)
+
+        # Filter for the requested files, if specified
+        if sourcefiles is not None:
+            sourcefiles = '|'.join(map(re.escape, sourcefiles))
+            df = df[df['SourceFile'].str.contains(sourcefiles)]
+
+        # Make sure dates are recognizable as datetime
+        df['CreateDate'] = pd.to_datetime(df['CreateDate'],
+                                          format='%Y:%m:%d %H:%M:%S')
+        # If filtering by date bounds:
+        if startdate is not None:
+            startdate = pd.to_datetime(startdate, format="%Y%m%d_%H%M%S")
+            df = df[df['CreateDate'] >= startdate]
+        if enddate is not None:
+            enddate = pd.to_datetime(enddate, format="%Y%m%d_%H%M%S")
+            df = df[df['CreateDate'] <= enddate]
+
+        # Filter by requested fields
+        if fields is None:
+            fields = self.fields_short
+        # Shorten column names to shorthand
+        df.columns = [col.split(':')[-1] for col in df.columns]
+        # Fields of interest that exist in CSV:
+        avail_fields_sh = [i for i in fields \
+                           if i in df.columns]
+        # Grab only fields of interest in order
+        df = df[avail_fields_sh]
+        
+        # Remove path from SourceFile if necessary
+        if not withPath and ('SourceFile' in df.columns):
+            SourceFiles = df['SourceFile'].tolist()
+            SourceFiles = [s.split(os.sep)[-1] \
+                           for s in SourceFiles]
+            df['SourceFile'] = SourceFiles
+
+        df.reset_index(drop=True, inplace=True)
+        return df
