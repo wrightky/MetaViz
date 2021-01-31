@@ -1,10 +1,13 @@
 __version__ = "0.0.1"
 
+# Interfacing with the metadata
 from . import config
-from . import archive
+from .archive import Archive
+Archive = Archive()
 
-Archive = archive.Archive()
-
-from .tools import *
+# Plotting routines
 from .plot_timeseries import *
 
+# Other tools and functions
+from .tools import *
+from . import tools_datenames as dnt
