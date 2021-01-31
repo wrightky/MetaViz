@@ -6,6 +6,7 @@ import os
 import pandas as pd
 # import cv2
 # import shutil
+import .config as cf
 
 
 def IntersectLists(entries):
@@ -144,11 +145,12 @@ def StitchPanorama(images, outfile, mode=1):
     Outputs:
         Saves output panoramic photo, if stitching is successful
     """
-    try:
-        import cv2
-    except ImportError:
-        print("Cannot stitch panoramic, requires installation of cv2")
+    # Check if Chord is available
+    if not cf.OpenCVAvailable:
+        print("Function unavailable, requires installation of OpenCV")
+        print("See installation guide for auxilary packages")
         return
+    import cv2
 
     # read input images
     imgs = []

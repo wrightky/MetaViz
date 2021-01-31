@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Plotting routines dedicated to time-series
+Plotting routines dedicated to time-series or temporal trends
 """
 import numpy as np
 import pandas as pd

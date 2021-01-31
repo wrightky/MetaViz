@@ -9,7 +9,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-
+#--------------------------------------
+# Magnitude Plots
+#--------------------------------------
 def BarChart(data, N=40, exclude=None, include=None):
     """
     Horizontal bar chart showing relative magnitudes

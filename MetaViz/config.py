@@ -54,7 +54,9 @@ for ex_fold in ExcludeFolders:
     subfolders = [s for s in subfolders if ex_fold not in s]
 subfolders = [s.replace(CollectionPath,'')[1:] for s in subfolders[1:]]
 
-# Check which tertiary plotting packages are available
+#---------------------------------------------------------
+# Check for auxilary packages
+#---------------------------------------------------------
 try:
     import seaborn
     SeabornAvailable = True
@@ -72,3 +74,9 @@ try:
     NetworkXAvailable = True
 except ImportError:
     NetworkXAvailable = False
+
+try:
+    import cv2
+    OpenCVAvailable = True
+except ImportError:
+    OpenCVAvailable = False
