@@ -2,11 +2,33 @@
 """
 Misc additional tools that may be useful for the archive
 """
-import numpy as np
 import os
-# import pandas
 # import cv2
 # import shutil
+
+
+def CopyFiles(sourcefiles, dst_folder):
+    """
+    Copy a list of sourcefiles to a destination folder.
+    
+    Inputs:
+        sourcefiles (list) : List of paths to sourcefiles to copy,
+            specified as stringss, e.g. the output of 
+            Archive.FindSource([...], withPath=True)
+        dst_folder (str) : Destination folder to which to copy
+    Outputs:
+        Copies each sourcefile to the specified folder
+    """
+    import shutil
+
+    if not os.path.exists(dst_folder):
+        os.makedirs(dst_folder)
+
+    for name in sourcefiles:
+        shutil.copy2(name, os.path.join(dst_folder,
+                                        name.split(os.sep)[-1]))
+    return
+
 
 def StitchPan(images, outfile, mode=1):
     """
@@ -45,3 +67,4 @@ def StitchPan(images, outfile, mode=1):
     else:
         cv2.imwrite(outfile, pano)
         print("Stitching successful, %s saved" % output_file)
+    return
