@@ -7,6 +7,7 @@ Archive = Archive()
 
 # Plotting routines
 from .plot_timeseries import *
+from .plot_magnitude import *
 
 # Other tools and functions
 from .tools import *
