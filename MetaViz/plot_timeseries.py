@@ -1,19 +1,12 @@
 #!/usr/bin/env python3
 """
-Core of the plotting routines, holds basic central
-matplotlib-based functions
+Plotting routines dedicated to time-series
 """
 import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
-
-
-#--------------------------------------
-# Magnitude Plots
-#--------------------------------------
-
 
 #--------------------------------------
 # Time-Series Plots
@@ -65,7 +58,6 @@ def OccurancePlot(archive,
     return
 
 
-
 def OccuranceMagnitude(archive,
                        searchterms,
                        fields=None,
@@ -100,7 +92,7 @@ def OccuranceMagnitude(archive,
     colors = np.array(colors)
     colors[:,3] = alpha
     np.random.shuffle(colors)
-    
+
     for ii, term in enumerate(searchterms):
         # Find filenames with search terms in field
         sourcefiles = archive.FindSource([term], fields)
