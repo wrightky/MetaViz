@@ -30,6 +30,40 @@ def CopyFiles(sourcefiles, dst_folder):
     return
 
 
+def BatchRename(oldNames, newNames):
+    """
+    Rename a list of files given in oldNames to the newName
+    of the same index.
+    
+    Inputs:
+        oldNames (list) : List of absolute or relative paths to
+            existing files to be renamed
+        newNames (list) : List of absolute or relative paths to
+            new names for the files in oldNames
+    Outputs:
+        Changes the name of each file in oldNames to match newNames
+    """
+    for ii in list(range(0, len(oldNames))):
+        # Don't rename a file already in the correct format
+        if oldNames[ii] == newNames[ii]:
+            continue
+        
+        # Check if another file of same name as newName exists:
+        if not os.path.exists(newNames[ii]):
+            os.rename(oldNames[ii], newNames[ii])
+        else: # If so, append name with a digit
+            suffix = 1
+            while True:
+                filetype = oldNames[ii].split('.')[-1]
+                appendedName = newNames[ii].split('.')[0] + '-' \
+                               + str(suffix) + filetype
+                if not os.path.exists(appendedName):
+                    os.rename(oldNames[ii], appendedName)
+                    break
+                suffix += 1
+    return
+
+
 def StitchPan(images, outfile, mode=1):
     """
     Automatically stitches together panoramic photos from
