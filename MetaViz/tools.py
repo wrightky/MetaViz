@@ -3,8 +3,51 @@
 Misc additional tools that may be useful for the archive
 """
 import os
+import pandas as pd
 # import cv2
 # import shutil
+
+
+def IntersectLists(entries):
+    """
+    Find intersection of input lists. Useful for 
+    existing lists or complex searches.
+
+    Inputs:
+        entries (list) : list of lists to
+            intersect [[...],[...]]
+    Outputs:
+        intersection (list) : intersection of all entry lists
+    """
+    for ii in list(range(len(entries)-1)):
+        if ii == 0:
+            entryset = set(entries[0])
+        else:
+            entryset = set(intersection)
+        intersection = list(entryset.intersection(entries[ii+1]))
+    # Re-sort if necessary
+    intersection = sorted(intersection)
+    return intersection
+
+
+def DifferenceLists(entries):
+    """
+    Find difference of one list with another.
+    Useful for existing lists or complex searches.
+
+    Inputs:
+        entries (list) : list of two lists to
+            difference [[...],[...]]
+    Outputs:
+        diff (list) : difference of all entry lists
+    """
+    if len(entries) > 2:
+        raise ValueError('Symmetric difference only works on two lists')
+    entryset = set(entries[0])
+    diff = list(entryset.symmetric_difference(entries[1]))
+    # Re-sort if necessary
+    diff = sorted(diff)
+    return diff
 
 
 def CopyFiles(sourcefiles, dst_folder):
@@ -64,7 +107,30 @@ def BatchRename(oldNames, newNames):
     return
 
 
-def StitchPan(images, outfile, mode=1):
+def BatchTimedelta(oldDates, timedelta, dt_format='%Y%m%d_%H%M%S'):
+    """
+    Simple function to take a list of datetimes and add a constant
+    time-delta, useful for batch date correction.
+    
+    Inputs:
+        oldDates (list) : List of old datetimes to be fixed
+        timedelta (str) : Constant timedelta to add to oldDates,
+            specified in a format recognized by pandas.Timedelta(),
+            such as "1hr"
+        dt_format (str) : Datetime format matching oldDates, given
+            as one of the formats recognized by pandas.to_datetime()
+    Outputs:
+        newDates (list) : List of new datetimes after shift
+    """
+    df = pd.DataFrame()
+    df['oldDates'] = pd.to_datetime(oldDates, format=dt_format)
+    df['newDates'] = df['oldDates'] + pd.Timedelta(timedelta)
+    newDates = df['newDates'].dt.strftime(dt_format).tolist()
+    
+    return newDates
+
+
+def StitchPanorama(images, outfile, mode=1):
     """
     Automatically stitches together panoramic photos from
     sub-scenes or scans. Requires cv2
@@ -93,6 +159,7 @@ def StitchPan(images, outfile, mode=1):
             break
         imgs.append(img)
 
+    # Do stitching
     stitcher = cv2.Stitcher.create(mode)
     status, pano = stitcher.stitch(imgs)
 

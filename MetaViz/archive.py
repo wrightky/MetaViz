@@ -281,45 +281,6 @@ class Archive():
         return FileNames
 
 
-    def IntersectLists(self, entries):
-        """
-        Find intersection of input lists. Useful for 
-        existing lists or complex searches.
-        
-        Inputs:
-            entries (list) : list of lists to intersect [[...],[...]]
-        Outputs:
-            intersection (list) : intersection of all entry lists
-        """
-        for ii in list(range(len(entries)-1)):
-            if ii == 0:
-                entryset = set(entries[0])
-            else:
-                entryset = set(intersection)
-            intersection = list(entryset.intersection(entries[ii+1]))
-        # Re-sort if necessary
-        intersection = sorted(intersection)
-        return intersection
-
-
-    def DifferenceLists(self, entries):
-        """
-        Find difference of one list with another.
-        Useful for existing lists or complex searches.
-        
-        Inputs:
-            entries (list) : list of two lists to difference [[...],[...]]
-        Outputs:
-            diff (list) : difference of all entry lists
-        """
-        if len(entries) > 2:
-            raise ValueError('Symmetric difference only works on two lists')
-        entryset = set(entries[0])
-        diff = list(entryset.symmetric_difference(entries[1]))
-        diff = sorted(diff) # Re-sort if necessary
-        return diff
-
-
     def GrabData(self, sourcefiles=None, fields=None,
                  startdate=None, enddate=None,
                  withPath=False):
