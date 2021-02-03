@@ -6,7 +6,7 @@ import os
 import pandas as pd
 # import cv2
 # import shutil
-import .config as cf
+from . import config as cf
 
 
 def IntersectLists(entries):
