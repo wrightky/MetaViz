@@ -32,7 +32,8 @@ fields = ['SourceFile',
           'FileModifyDate',
           'XMP-digiKam:ImageHistory',
           'XMP-acdsee:Notes',
-          'XMP-dc:Source']
+          'XMP-dc:Source',
+          'Duration']
 
 # Set global verbose flag for printed function outputs
 verbose = True
