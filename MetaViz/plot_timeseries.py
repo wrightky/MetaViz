@@ -136,12 +136,13 @@ def ViolinPlot(archive, terms, fields,
         palette, inner, scale, cut, linewidth : See requirements
             for seaborn.violinplot()
     """
-    # Check if Chord is available
+    # Check if Seaborn is available
     if not cf.SeabornAvailable:
         print("Function unavailable, requires installation of Seaborn")
         print("See installation guide for auxilary packages")
         return
     import seaborn as sns
+    sns.set_theme(style="whitegrid")
 
     dates = []
     refdate = pd.to_datetime(refdate, format="%Y%m%d_%H%M%S")
@@ -163,4 +164,87 @@ def ViolinPlot(archive, terms, fields,
     ax = sns.violinplot(data=df, ax=ax, width=0.95, orient='h',
                         palette=palette, inner=inner, scale=scale,
                         cut=cut, linewidth=linewidth)
+    return
+
+
+def RidgePlot(archive, terms, fields,
+              refdate='19800101_000000',
+              palette='deep', bw_adjust=0.5,
+              aspect=8, height=0.8):
+    """
+    Wrapper for the Seaborn Ridge plot. For each keyword
+    in terms, find files for which that keyword appears in fields,
+    and plot a kernel of occurances by date. Most other attributes
+    are aesthetic adjustments fed into seaborn, see example at
+    https://seaborn.pydata.org/examples/kde_ridgeplot.html
+    
+    Inputs:
+        archive (obj) : MetaViz.Archive object
+        terms (list) : Keywords to search for in Archive, fed into
+            Archive.FindSource()
+        fields (list) : Exif fields in which to search for terms,
+            fed into Archive.FindSource()
+        refdate (str) : Reference date which is used to convert
+            pandas datetime to numeric dates, ideally a value
+            similar to the dates returned from the collection
+        palette (str) : Seaborn color palette
+        bw_adjust (float) : Smoothness of the kernel
+        aspect (float) : width/height of figure
+        height (float) : height of each FacetGrid
+    """
+    # Check if Seaborn is available
+    if not cf.SeabornAvailable:
+        print("Function unavailable, requires installation of Seaborn")
+        print("See installation guide for auxilary packages")
+        return
+    import seaborn as sns
+    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+
+    dates = []
+    refdate = pd.to_datetime(refdate, format="%Y%m%d_%H%M%S")
+    for n, term in enumerate(terms):
+        # Create a random dataset across several variables
+        sourcefiles = archive.FindSource([term], fields)
+        # Grab and filter by datetimes 
+        data = archive.GrabData(sourcefiles, ['CreateDate'])
+        dfl = pd.DataFrame()
+        # Convert to numeric date
+        dfl['epoch'] = (data['CreateDate']-refdate)//pd.Timedelta("1d")
+        dfl['epoch'] = dfl['epoch']/365.0 + refdate.year
+        # Create term column to create long-form tidy df
+        dfl['term'] = np.tile(term, len(dfl['epoch']))
+        dates.append(dfl)
+    # Append all the dates into a new dataframe
+    df = pd.concat(dates)
+
+    # Initialize the FacetGrid object
+    g = sns.FacetGrid(df, row="term", hue="term",
+                      aspect=aspect, height=height, palette=palette)
+
+    # Draw the densities in a few steps
+    g.map(sns.kdeplot, "epoch",
+          bw_adjust=bw_adjust, clip_on=False,
+          fill=True, alpha=1, linewidth=1.5)
+    g.map(sns.kdeplot, "epoch", clip_on=False, 
+          color="w", lw=2, bw_adjust=bw_adjust)
+    g.map(plt.axhline, y=0, lw=2, clip_on=False)
+
+    # Define and use a simple function to label the plot in axes coordinates
+    def label(x, color, label):
+        ax = plt.gca()
+        ax.text(0, .2, label, fontweight="bold", color=color,
+                ha="left", va="center", transform=ax.transAxes, fontsize=14)
+    g.map(label, "epoch")
+
+    # Set the subplots to overlap
+    g.fig.subplots_adjust(hspace=-0.25)
+
+    # Other minor details for tuning the plot
+    g.set_titles("")
+    g.set(yticks=[])
+    g.despine(bottom=True, left=True)
+    ax = plt.gca()
+    ax.tick_params(axis='x', which='major', labelsize=10, color='k')
+    ax.set_xlabel(None)
+    plt.gcf().set_dpi(200)
     return
