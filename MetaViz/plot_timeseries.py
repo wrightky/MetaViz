@@ -115,6 +115,7 @@ def OccuranceMagnitude(archive,
 
 
 def ViolinPlot(archive, terms, fields,
+               startdate=None, enddate=None,
                refdate='19800101_000000',
                palette='Set2', inner='points',
                scale='area', cut=0, linewidth=0.8):
@@ -130,6 +131,10 @@ def ViolinPlot(archive, terms, fields,
             Archive.FindSource()
         fields (list) : Exif fields in which to search for terms,
             fed into Archive.FindSource()
+        startdate (str) : Datetime (YYYYmmdd_HHMMSS) after which
+            to return data.
+        enddate (str) : Datetime (YYYYmmdd_HHMMSS) before which
+            to return data.
         refdate (str) : Reference date which is used to convert
             pandas datetime to numeric dates, ideally a value
             similar to the dates returned from the collection
@@ -150,7 +155,8 @@ def ViolinPlot(archive, terms, fields,
         # Create a random dataset across several variables
         sourcefiles = archive.FindSource([term], fields)
         # Grab and filter by datetimes 
-        data = archive.GrabData(sourcefiles, ['CreateDate'])
+        data = archive.GrabData(sourcefiles, ['CreateDate'],
+                                startdate, enddate)
         # Convert to numeric date
         data['epoch'] = (data['CreateDate']-refdate)//pd.Timedelta("1d")
         # Save to list
@@ -168,6 +174,7 @@ def ViolinPlot(archive, terms, fields,
 
 
 def RidgePlot(archive, terms, fields,
+              startdate=None, enddate=None,
               refdate='19800101_000000',
               palette='deep', bw_adjust=0.5,
               aspect=8, height=0.8):
@@ -184,6 +191,10 @@ def RidgePlot(archive, terms, fields,
             Archive.FindSource()
         fields (list) : Exif fields in which to search for terms,
             fed into Archive.FindSource()
+        startdate (str) : Datetime (YYYYmmdd_HHMMSS) after which
+            to return data.
+        enddate (str) : Datetime (YYYYmmdd_HHMMSS) before which
+            to return data.
         refdate (str) : Reference date which is used to convert
             pandas datetime to numeric dates, ideally a value
             similar to the dates returned from the collection
@@ -206,7 +217,8 @@ def RidgePlot(archive, terms, fields,
         # Create a random dataset across several variables
         sourcefiles = archive.FindSource([term], fields)
         # Grab and filter by datetimes 
-        data = archive.GrabData(sourcefiles, ['CreateDate'])
+        data = archive.GrabData(sourcefiles, ['CreateDate'],
+                                startdate, enddate)
         dfl = pd.DataFrame()
         # Convert to numeric date
         dfl['epoch'] = (data['CreateDate']-refdate)//pd.Timedelta("1d")
