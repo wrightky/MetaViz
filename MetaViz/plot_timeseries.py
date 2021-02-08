@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from . import config as cf
 
 #--------------------------------------
 # Time-Series Plots
@@ -110,4 +111,56 @@ def OccuranceMagnitude(archive,
     plt.ylim([0.5, len(searchterms) + 0.5])
     plt.yticks(list(range(len(searchterms),0,-1)), searchterms)
     plt.title('Occurances by Date')
+    return
+
+
+def ViolinPlot(archive, terms, fields,
+               refdate='19800101_000000',
+               palette='Set2', inner='points',
+               scale='area', cut=0, linewidth=0.8):
+    """
+    Wrapper for the Seaborn violin plot function. For each keyword
+    in terms, find files for which that keyword appears in fields,
+    and plot a violin of occurances by date. Most other attributes
+    are aesthetic adjustments fed into seaborn.violinplots()
+    
+    Inputs:
+        archive (obj) : MetaViz.Archive object
+        terms (list) : Keywords to search for in Archive, fed into
+            Archive.FindSource()
+        fields (list) : Exif fields in which to search for terms,
+            fed into Archive.FindSource()
+        refdate (str) : Reference date which is used to convert
+            pandas datetime to numeric dates, ideally a value
+            similar to the dates returned from the collection
+        palette, inner, scale, cut, linewidth : See requirements
+            for seaborn.violinplot()
+    """
+    # Check if Chord is available
+    if not cf.SeabornAvailable:
+        print("Function unavailable, requires installation of Seaborn")
+        print("See installation guide for auxilary packages")
+        return
+    import seaborn as sns
+
+    dates = []
+    refdate = pd.to_datetime(refdate, format="%Y%m%d_%H%M%S")
+    for n, term in enumerate(terms):
+        # Create a random dataset across several variables
+        sourcefiles = archive.FindSource([term], fields)
+        # Grab and filter by datetimes 
+        data = archive.GrabData(sourcefiles, ['CreateDate'])
+        # Convert to numeric date
+        data['epoch'] = (data['CreateDate']-refdate)//pd.Timedelta("1d")
+        # Save to list
+        dates.append(data['epoch']/365.0 + refdate.year)
+
+    # Append all the dates into a new dataframe
+    df = pd.concat(dates, axis=1, keys=terms)
+
+    # Show each distribution with both violins and points
+    fig, ax = plt.subplots(figsize=(3,len(terms)/1.5), dpi=200)
+    ax = sns.violinplot(data=df, ax=ax, width=0.95, orient='h',
+                        palette=palette, inner=inner, scale=scale,
+                        cut=cut, linewidth=linewidth)
     return
