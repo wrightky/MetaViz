@@ -158,3 +158,179 @@ def TemporalStats(data, datefield='CreateDate', color='k'):
     ax4.set_xlabel('Day of Year')
     plt.subplots_adjust(hspace=0.55)
     return
+
+
+def HeatmapMonth(data, datefield='CreateDate',
+                 uselog=True, cmap='magma'):
+    """
+    Plot a 2D heatmap of the number of files in data sorted by
+    year on the x-axis and month on the y-axis. Color axis
+    defaults to log scale to show relative structure.
+    
+    Inputs:
+        data (pandas.DataFrame) : DataFrame output of Archive.GrabData()
+            containing the datefield specified
+        datefield (str) : String name of the date field in data
+        uselog (bool) : Flag decides whether to show color axis in
+            linear or log10 space
+        cmap (str) : Matplotlib colormap to be used for the heatmap
+    """
+    # Isolate important date information 
+    years = data[datefield].dt.year.to_numpy()
+    months = data[datefield].dt.month.to_numpy()
+
+    yr_mon_sorted = np.zeros((12, (max(years)+1-min(years))), dtype=float)
+    # Loop through years
+    for yy in np.arange(min(years), max(years)+1, 1):
+        months_this_year = months[years==yy]
+        # Loop through months
+        for mm in (np.arange(12)+1):
+            yr_mon_sorted[mm-1, yy-min(years)] = \
+                np.count_nonzero(months_this_year==mm)
+
+    if uselog:
+        yr_mon_sorted[yr_mon_sorted==0] = 0.5
+        yr_mon_sorted = np.log10(yr_mon_sorted)
+
+    # Create figure
+    fig = plt.figure(figsize=(5,5), dpi=200)
+    plt.imshow(yr_mon_sorted, cmap=cmap,
+               extent=[min(years), max(years)+1, 12.5, 0.5])
+    ax = plt.gca()
+    ax.set_aspect((max(years)+1-min(years))/20)
+    ti = plt.title('Media Files by Month')
+
+    cbar = plt.colorbar(fraction=0.0277)
+    if uselog:
+        cticks = [c for c in cbar.ax.get_yticks() if c.is_integer()]
+        fig.delaxes(cbar.ax)
+        cbar = plt.colorbar(fraction=0.0277, ticks=cticks)
+        cbar.ax.set_yticklabels([str(int(10.**c)) for c in cticks])
+
+    ax.set_yticks(list(range(1, 13)))
+    b = ax.set_yticklabels(['Jan','Feb','Mar','Apr','May','Jun',
+                           'Jul','Aug','Sep','Oct','Nov','Dec'])
+    ticks = ax.get_xticks()
+    ticks = [t for t in ticks if t <= max(years) and t >= min(years)]
+    b = ax.set_xticks([int(x) for x in ticks if x.is_integer()])
+    return
+
+
+def HeatmapWeek(data, datefield='CreateDate',
+                uselog=True, cmap='gnuplot2'):
+    """
+    Plot a 2D heatmap of the number of files in data sorted by
+    year on the x-axis and week of year on the y-axis. Color axis
+    defaults to log scale to show relative structure.
+    
+    Inputs:
+        data (pandas.DataFrame) : DataFrame output of Archive.GrabData()
+            containing the datefield specified
+        datefield (str) : String name of the date field in data
+        uselog (bool) : Flag decides whether to show color axis in
+            linear or log10 space
+        cmap (str) : Matplotlib colormap to be used for the heatmap
+    """
+    # Isolate important date information
+    years = data[datefield].dt.year.to_numpy()
+    weeks = data[datefield].dt.weekofyear.to_numpy()
+
+    yr_week_sorted = np.zeros((52, (max(years)+1-min(years))), dtype=float)
+    # Loop through years
+    for yy in np.arange(min(years), max(years)+1, 1):
+        weeks_this_year = weeks[years==yy]
+        # Loop through weeks
+        for ww in (np.arange(52)+1):
+            yr_week_sorted[ww-1, yy-min(years)] = \
+                np.count_nonzero(weeks_this_year==ww)
+
+    if uselog:
+        yr_week_sorted[yr_week_sorted==0] = 0.5
+        yr_week_sorted = np.log10(yr_week_sorted)
+
+    # Create figure
+    fig = plt.figure(figsize=(5,5), dpi=200)
+    plt.imshow(yr_week_sorted, cmap=cmap,
+               extent=[min(years), max(years)+1, 52.5, 0.5])
+    ax = plt.gca()
+    ax.set_aspect((max(years)+1-min(years))/86.7)
+    ti = plt.title('Media Files by Week of Year')
+
+    cbar = plt.colorbar(fraction=0.0277)
+    if uselog:
+        cticks = [c for c in cbar.ax.get_yticks() if c.is_integer()]
+        fig.delaxes(cbar.ax)
+        cbar = plt.colorbar(fraction=0.0277, ticks=cticks)
+        cbar.ax.set_yticklabels([str(int(10.**c)) for c in cticks])
+
+    ax.set_yticks(list(np.arange(1, 52, 4.33)))
+    ax.set_yticklabels(['Jan','Feb','Mar','Apr','May','Jun',
+                        'Jul','Aug','Sep','Oct','Nov','Dec'])
+    ticks = ax.get_xticks()
+    ticks = [t for t in ticks if t <= max(years) and t >= min(years)]
+    b = ax.set_xticks([int(x) for x in ticks if x.is_integer()])
+    return
+
+
+def HeatmapDay(data, datefield='CreateDate',
+               uselog=True, cmap='inferno'):
+    """
+    Plot a 2D heatmap of the number of files in data sorted by
+    year on the x-axis and day of year on the y-axis. Color axis
+    defaults to log scale to show relative structure.
+    
+    Note: For leap years, days after leap day get collapsed onto 
+    their normal DOY, and Feb 29th gets assigned to Feb 28th
+    
+    Inputs:
+        data (pandas.DataFrame) : DataFrame output of Archive.GrabData()
+            containing the datefield specified
+        datefield (str) : String name of the date field in data
+        uselog (bool) : Flag decides whether to show color axis in
+            linear or log10 space
+        cmap (str) : Matplotlib colormap to be used for the heatmap
+    """
+    # Isolate important date information, correct leaps
+    years = data[datefield].dt.year.to_numpy()
+    days = data[datefield].dt.dayofyear.to_numpy()
+    leaps = data[datefield].dt.is_leap_year.tolist()
+    for ii in list(range(len(days))):
+        if (leaps[ii]) & (days[ii] >= 60):
+            days[ii] -= 1
+
+    yr_day_sorted = np.zeros((365, (max(years)+1-min(years))), dtype=float)
+    # Loop through years
+    for yy in np.arange(min(years), max(years)+1, 1):
+        days_this_year = days[years==yy]
+        # Loop through days
+        for dd in (np.arange(365)+1):
+            yr_day_sorted[dd-1, yy-min(years)] = \
+                np.count_nonzero(days_this_year==dd)
+
+    if uselog:
+        yr_day_sorted[yr_day_sorted==0] = 0.5
+        yr_day_sorted = np.log10(yr_day_sorted)
+
+    # Create figure
+    fig = plt.figure(figsize=(5,5), dpi=700)
+    plt.imshow(yr_day_sorted, cmap=cmap,
+               extent=[min(years), max(years)+1, 365.5, 0.5])
+    ax = plt.gca()
+    ax.set_aspect((max(years)+1-min(years))/608)
+    ti = plt.title('Media Files by Day of Year')
+
+    cbar = plt.colorbar(fraction=0.0277)
+    if uselog:
+        cticks = [c for c in cbar.ax.get_yticks() if c.is_integer()]
+        fig.delaxes(cbar.ax)
+        cbar = plt.colorbar(fraction=0.0277, ticks=cticks)
+        cbar.ax.set_yticklabels([str(int(10.**c)) for c in cticks])
+
+    ax.set_yticks([1, 32, 60, 91, 121, 152, 182,
+                   213, 244, 274, 305, 335])
+    ax.set_yticklabels(['Jan','Feb','Mar','Apr','May','Jun',
+                        'Jul','Aug','Sep','Oct','Nov','Dec'])
+    ticks = ax.get_xticks()
+    ticks = [t for t in ticks if t <= max(years) and t >= min(years)]
+    b = ax.set_xticks([int(x) for x in ticks if x.is_integer()])
+    return
