@@ -4,6 +4,8 @@ Misc additional tools that may be useful for the archive
 """
 import os
 import pandas as pd
+import numpy as np
+import re
 # import cv2
 # import shutil
 from . import config as cf

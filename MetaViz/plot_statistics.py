@@ -6,10 +6,48 @@ import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+from . import tools
 
 #--------------------------------------
 # Statistics Plots
 #--------------------------------------
+def FileTypes(archive=None, files=None):
+    """
+    Plot a bar chart of file types (e.g. png, tiff), either in
+    a specific list of files, or in the entire collection.
+    
+    Inputs:
+        archive (obj) : MetaViz.Archive object, ignored if a
+            list of specific files is provided
+        files (list) : List of specific files for which to plot
+    """
+    if files is None:
+        files = archive.GrabData(fields=['SourceFile']).values.tolist()
+    # Grab file extensions, make lowercase, load into df
+    ext = [f[0].split('.')[-1].lower() for f in files]
+    df = pd.DataFrame()
+    df['ext'] = ext
+
+    # Count instances of each
+    data = tools.CountUnique(df['ext'])
+    x = data['Entry'].tolist()
+    y = data['Count'].tolist()
+    N = len(data['Entry'])
+
+    # Do plotting
+    colors = matplotlib.cm.Set3(np.arange(len(x))/float(len(x)))
+    np.random.shuffle(colors)
+
+    fig, ax = plt.subplots(figsize=(N*12/30,3), dpi=150)
+    mybar = ax.bar(x, y, log=True, color=colors, edgecolor='k')
+    ax.set_ylabel('File Count')
+    ax.set_title('Filetypes in Collection')
+    b = ax.set_xticklabels(x, rotation=-40)
+    ax.set_axisbelow(True)
+    ax.yaxis.grid(color='gray', which='both', alpha=0.3)
+    return
+
+
 def HistogramYear(data, datefield='CreateDate', color='k'):
     """
     Plot a histogram of the CreateDate of files in data sorted by year

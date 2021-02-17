@@ -81,3 +81,9 @@ try:
     OpenCVAvailable = True
 except ImportError:
     OpenCVAvailable = False
+
+try:
+    from PIL import Image
+    PillowAvailable = True
+except ImportError:
+    PillowAvailable = False
