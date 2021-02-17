@@ -16,11 +16,11 @@ def BarChart(data, N=40, exclude=None, include=None):
     """
     Horizontal bar chart showing relative magnitudes
     of entries in the DataFrame "data", which contains
-    the output of a call to Archive.CountUnique()
+    the output of a call to tools.CountUnique()
     
     Inputs:
         data (pandas DataFrame) : DataFrame output of
-            Archive.CountUnique() which contains the values
+            tools.CountUnique() which contains the values
             used for plotting
         N (int or bool) : Number of entries to show on the chart
         exclude (list or bool) : List of entries in data to
@@ -61,11 +61,11 @@ def PieChart(data, N=20, exclude=None, include=None):
     """
     Regular pie chart showing relative magnitudes
     of entries in the DataFrame "data", which contains
-    the output of a call to Archive.CountUnique()
+    the output of a call to tools.CountUnique()
     
     Inputs:
         data (pandas DataFrame) : DataFrame output of
-            Archive.CountUnique() which contains the values
+            tools.CountUnique() which contains the values
             used for plotting
         N (int or bool) : Number of entries to show on the chart
         exclude (list or bool) : List of entries in data to
