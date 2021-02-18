@@ -12,6 +12,28 @@ from . import config as cf
 #--------------------------------------
 # Image Plots
 #--------------------------------------
+def ShowImage(file, showTitle=True):
+    """
+    Generates a figure of the specified image.
+    
+    Inputs:
+        file (str) : String path to image file
+        showTitle (bool) : Optionally show filename title
+    """
+    img = matplotlib.image.imread(file)
+    
+    # Make figure
+    fig = plt.figure(figsize=(5,5), dpi=200)
+    imgplot = plt.imshow(img)
+    ax = plt.gca()
+    ax.set_xticks([])
+    ax.set_yticks([])
+    if showTitle:
+        title = os.path.basename(file).split('.')[0]
+        ax.set_title(title)
+    return
+
+
 def ShowThumbnails(files, res=64, showTitle=True, size='x-small'):
     """
     Generate a plot of image thumbnails for a given list of files.
@@ -19,7 +41,7 @@ def ShowThumbnails(files, res=64, showTitle=True, size='x-small'):
     
     Note: Function requires a functional installation of Pillow
     Inputs:
-        files (list) : List of paths to image files to show
+        files (list) : List of string paths to image files
         res (int) : Resolution of the resized thumbnails, wherein
             the max size is an image of size (res, res)
         showTitle (bool) : Optionally show filename thumbnail titles
