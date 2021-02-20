@@ -7,6 +7,7 @@ import pandas as pd
 import os
 import re
 from . import config as cf
+from . import tools
 
 class Archive():
     """Parent class for the media collection"""
@@ -351,3 +352,38 @@ class Archive():
 
         df.reset_index(drop=True, inplace=True)
         return df
+
+
+    def DownloadCoverage(self, delimiter=', ',
+                         overwrite_existing=False):
+        """
+        Function will save a 'LocationCoords.csv' file in the
+        metadata repository based on the Coverage field for use
+        with the geospatial plotting routines.
+        
+        Inputs:
+            delimiter (str) : String delimiter used to
+                separate entries in the Coverage column
+            overwrite_existing (bool) : Flag to enable overwriting
+                an existing coverage file, which defaults to false
+        Outputs:
+            Saves a LocationCoords.csv file in the metadata folder
+                containing the output of a call to tools.CountUnique()
+        """
+        csvname = os.path.join(self.csvPath, 'LocationCoords.csv')
+        
+        if overwrite_existing or not os.path.exists(csvname):
+            df = self.GrabData(None, ['Coverage'])
+            df = tools.CountUnique(df['Coverage'],
+                                   delimiter=delimiter)
+            df.rename(columns={"Entry": "Location",
+                               "Count": "Appearances"},
+                      inplace=True)
+            df['Latitude'] = ""
+            df['Longitude'] = ""
+
+            df.to_csv(csvname, index=False, encoding="ISO-8859-1")
+        else:
+            print('Coverage CSV already exists. \nTo overwrite'+ \
+                  ' existing file, set overwrite_existing=True')
+        return

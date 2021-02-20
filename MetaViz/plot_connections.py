@@ -60,7 +60,8 @@ def ChordChart(Archive, keywords, fields):
     return
 
 
-def Heatmap1(Archive, field, N=20, exclude=None, include=None):
+def Heatmap1(Archive, field, N=20, cmap='CMRmap',
+             exclude=None, include=None):
     """
     For the top N keywords in field, plot a heatmap showing the
     extent to which those keywords tend to appear along with
@@ -73,6 +74,7 @@ def Heatmap1(Archive, field, N=20, exclude=None, include=None):
             metadata fields via FindSource()
         field (str) : Field in which to look for keywords
         N (int) : Number of entries to show on the chart
+        cmap (str) : Matplotlib colormap to be used for the heatmap
         exclude (list or bool) : List of entries in data to
             specifically exclude from the plot
         include (list or bool) : List of entries in data to
@@ -108,7 +110,7 @@ def Heatmap1(Archive, field, N=20, exclude=None, include=None):
 
     # Do plotting
     fig = plt.figure(figsize=(0.4*N, 0.4*N), dpi=300)
-    plt.imshow(matrix, cmap='CMRmap')
+    plt.imshow(matrix, cmap=cmap)
     ax = plt.gca()
     ax.set_yticks(list(np.arange(0, N)))
     b = ax.set_yticklabels(keywords)
@@ -120,7 +122,7 @@ def Heatmap1(Archive, field, N=20, exclude=None, include=None):
 
 
 def Heatmap2(Archive, field_x, field_y, 
-             N_x=20, N_y=20, 
+             N_x=20, N_y=20, cmap='CMRmap',
              exclude_x=None, exclude_y=None, 
              include_x=None, include_y=None):
     """
@@ -135,6 +137,7 @@ def Heatmap2(Archive, field_x, field_y,
             metadata fields via FindSource()
         field (str) : Field in which to look for keywords
         N (int) : Number of entries to show on the chart
+        cmap (str) : Matplotlib colormap to be used for the heatmap
         exclude (list or bool) : List of entries in data to
             specifically exclude from the plot
         include (list or bool) : List of entries in data to
@@ -175,7 +178,7 @@ def Heatmap2(Archive, field_x, field_y,
 
     # Do plotting
     fig = plt.figure(figsize=(0.4*N_x, 0.4*N_y), dpi=300)
-    plt.imshow(matrix.T, cmap='CMRmap')
+    plt.imshow(matrix.T, cmap=cmap)
     ax = plt.gca()
     ax.set_yticks(list(np.arange(0, N_y)))
     b = ax.set_yticklabels(keywords_y)
