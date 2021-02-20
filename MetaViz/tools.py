@@ -223,3 +223,91 @@ def StitchPanorama(images, outfile, mode=1):
         cv2.imwrite(outfile, pano)
         print("Stitching successful, %s saved" % output_file)
     return
+
+
+def Coverage2Coords(geolocator, min_delay_seconds=2):
+    """
+    Using GeoPy geolocator, try to convert Location names in
+    the Coverage field to lat/long coordinates. Requires that
+    Archive.DownloadCoverage() has been called prior to this
+    function. Built around the example provided at
+    https://geopy.readthedocs.io/en/latest/#usage-with-pandas
+    
+    NOTE: Function is not perfect, and almost certainly will
+    require manual cleaning after the fact! However, can
+    definitely save time for large queries. Make sure that
+    usage of this function abides by ToS agreed to by the
+    user in obtaining the API key for the GeoPy geolocator
+    (e.g. set min_delay_seconds accordingly)
+    
+    Inputs:
+        geolocator (obj) : A geolocator instance of one of
+            the classes inside geopy.geocoders, such as
+            OpenMapQuest(api_key = 'user_api_key_here')
+        min_delay_seconds (float) : Time delay fed into the
+            geopy.extra.rate_limiter.RateLimiter to keep
+            repeated queries from overloading the servers and
+            violating the user's ToS with the geocoding service
+    Outputs:
+        Updates the LocationCoords.csv file with coordinates
+            for each Location found using a GeoPy search
+    """
+    # Check if GeoPy is available
+    if not cf.GeoPyAvailable:
+        print("Function unavailable, requires installation of GeoPy")
+        print("See installation guide for auxilary packages")
+        return
+    from geopy.extra.rate_limiter import RateLimiter
+
+    # Set a rate limiter by default to keep within geolocator ToS
+    geocode = RateLimiter(geolocator.geocode,
+                          min_delay_seconds=min_delay_seconds)
+    
+    # Load in csv of coverage
+    csvname = os.path.join(cf.csvPath, 'LocationCoords.csv')
+    if not os.path.exists(csvname):
+        print('Error: Archive.DownloadCoverage() must be run '+\
+              'before calling this function. Exiting')
+        return
+    df = pd.read_csv(csvname, encoding = "ISO-8859-1",
+                     low_memory=False)
+    
+    # Call GeoPy geocode function on the Location field of df
+    df['Details'] = df['Location'].apply(geocode)
+    df['Coord'] = df['Details'].apply(lambda loc: tuple(loc.point) if loc else None)
+    
+    # Sometimes default XMP syntax is bad for searches.
+    # For queries which failed, try again with simplified syntax
+    # Create sub-df of modified names, eliminate parenthetical
+    df['LocationMod'] = df['Location'].str.replace(r'\([^()]*\)', '')
+    df2 = df.loc[df['Coord'].isnull(), ['LocationMod']]
+
+    # Feed sub-df back into geocode
+    df2['Details'] = df2['LocationMod'].apply(geocode)
+    df2['Coord'] = df2['Details'].apply(lambda loc: tuple(loc.point) if loc else None)
+    
+    # Update original df with new data
+    df.update(df2) 
+
+    # Fix any remaining nulls in coordinates column with (0, 0, 0)
+    df2 = df.loc[df['Coord'].isnull(), ['Location']]
+    df2['Coord'] = [(0, 0, 0)] * len(df2)
+    df.update(df2) 
+
+    # Extract lat long from Coord
+    coord = df['Coord'].tolist()
+    lat = [p[0] for p in coord]
+    lon = [p[1] for p in coord]
+
+    df['Latitude'] = lat
+    df['Longitude'] = lon
+
+    # Delete extra columns no longer needed
+    df.drop(columns=['LocationMod', 'Coord'], inplace=True)
+
+    # Query often returns complex characters, revert to default encoding
+    df = df.applymap(lambda x: str(x).encode("ISO-8859-1",
+             errors="ignore").decode("ISO-8859-1", errors="ignore"))
+    # Save csv
+    df.to_csv(csvname, index=False, encoding="ISO-8859-1")
+    return

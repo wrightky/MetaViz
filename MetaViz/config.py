@@ -87,3 +87,15 @@ try:
     PillowAvailable = True
 except ImportError:
     PillowAvailable = False
+
+try:
+    import plotly
+    PlotlyAvailable = True
+except ImportError:
+    PlotlyAvailable = False
+
+try:
+    import geopy
+    GeoPyAvailable = True
+except ImportError:
+    GeoPyAvailable = False
