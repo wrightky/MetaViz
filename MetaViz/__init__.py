@@ -1,9 +1,8 @@
-__version__ = "0.1.2"
+__version__ = “0.2.0”
 
 # Interfacing with the metadata
 from . import config
 from .archive import Archive
-Archive = Archive()
 
 # Plotting routines
 from .plot_timeseries import *
