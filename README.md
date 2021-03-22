@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/wrightky/MetaViz/main/gallery/banner.gif?token=AHMFST7LQZORXG5QQR633J3ALEJBY)
+![](gallery/banner.gif?raw=true)
 
 # MetaViz - Media Metadata Visualization Library
 
