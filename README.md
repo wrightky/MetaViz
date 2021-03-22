@@ -1,4 +1,6 @@
-![metaviz logo](https://github.com/wrightky/MetaViz/blob/main/gallery/banner.gif)
+<div class="nav3" style="height:500px;">
+    <img src="gallery/banner.gif" alt="Media Metadata Visualization Library" width="75%"></a>
+</div>
 
 # MetaViz - Media Metadata Visualization Library
 
