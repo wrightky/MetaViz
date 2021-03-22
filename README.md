@@ -1,3 +1,5 @@
+![metaviz logo](https://github.com/wrightky/MetaViz/blob/main/gallery/banner.gif)
+
 # MetaViz - Media Metadata Visualization Library
 
 **Repository of tools to interface with, visualize, and edit the metadata information in a collection or archive of visual media (i.e. photos and videos).**
