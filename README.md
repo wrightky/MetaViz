@@ -1,4 +1,4 @@
-![](gallery/banner.gif?raw=true)
+![](blob/main/gallery/banner.gif?raw=true)
 
 # MetaViz - Media Metadata Visualization Library
 
