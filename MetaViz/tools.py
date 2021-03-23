@@ -59,7 +59,7 @@ def CopyFiles(sourcefiles, dst_folder):
     
     Inputs:
         sourcefiles (list) : List of paths to sourcefiles to copy,
-            specified as stringss, e.g. the output of 
+            specified as strings, e.g. the output of 
             Archive.FindSource([...], withPath=True)
         dst_folder (str) : Destination folder to which to copy
     Outputs:
