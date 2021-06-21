@@ -22,11 +22,6 @@ class Archive():
         
         # Set verbose flag for function printing
         self.verbose = cf.verbose
-        
-        # Information on packages
-        self.SeabornAvailable = cf.SeabornAvailable
-        self.ChordAvailable = cf.ChordAvailable
-        self.NetworkXAvailable = cf.NetworkXAvailable
 
 
     def UpdateCSV(self, subfolders=None):

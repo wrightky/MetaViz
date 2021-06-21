@@ -8,8 +8,6 @@ import numpy as np
 import re
 # import cv2
 # import shutil
-from . import config as cf
-
 
 def IntersectLists(entries):
     """
@@ -197,12 +195,13 @@ def StitchPanorama(images, outfile, mode=1):
     Outputs:
         Saves output panoramic photo, if stitching is successful
     """
-    # Check if Chord is available
-    if not cf.OpenCVAvailable:
+    # Check if OpenCV is available
+    try:
+        import cv2
+    except ImportError:
         print("Function unavailable, requires installation of OpenCV")
-        print("See installation guide for auxilary packages")
+        print("Perform full setup for auxilary packages")
         return
-    import cv2
 
     # read input images
     imgs = []
@@ -225,7 +224,7 @@ def StitchPanorama(images, outfile, mode=1):
     return
 
 
-def Coverage2Coords(geolocator, min_delay_seconds=2):
+def Coverage2Coords(archive, geolocator, min_delay_seconds=2):
     """
     Using GeoPy geolocator, try to convert Location names in
     the Coverage field to lat/long coordinates. Requires that
@@ -241,6 +240,8 @@ def Coverage2Coords(geolocator, min_delay_seconds=2):
     (e.g. set min_delay_seconds accordingly)
     
     Inputs:
+        archive (obj) : archive.Archive() object used to access
+            csv files
         geolocator (obj) : A geolocator instance of one of
             the classes inside geopy.geocoders, such as
             OpenMapQuest(api_key = 'user_api_key_here')
@@ -253,18 +254,19 @@ def Coverage2Coords(geolocator, min_delay_seconds=2):
             for each Location found using a GeoPy search
     """
     # Check if GeoPy is available
-    if not cf.GeoPyAvailable:
+    try:
+        from geopy.extra.rate_limiter import RateLimiter
+    except ImportError:
         print("Function unavailable, requires installation of GeoPy")
-        print("See installation guide for auxilary packages")
+        print("Perform full setup for auxilary packages")
         return
-    from geopy.extra.rate_limiter import RateLimiter
 
     # Set a rate limiter by default to keep within geolocator ToS
     geocode = RateLimiter(geolocator.geocode,
                           min_delay_seconds=min_delay_seconds)
     
     # Load in csv of coverage
-    csvname = os.path.join(cf.csvPath, 'LocationCoords.csv')
+    csvname = os.path.join(archive.csvPath, 'LocationCoords.csv')
     if not os.path.exists(csvname):
         print('Error: Archive.DownloadCoverage() must be run '+\
               'before calling this function. Exiting')

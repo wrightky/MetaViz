@@ -9,13 +9,13 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from . import config as cf
 from . import tools
+# from chord import Chord
 
 #--------------------------------------
 # Connections Plots
 #--------------------------------------
-def ChordChart(Archive, keywords, fields):
+def ChordChart(archive, keywords, fields):
     """
     Plots a chord chart showing the degree to which the specified
     keywords appear together in the given metadata fields. Thickness
@@ -26,7 +26,7 @@ def ChordChart(Archive, keywords, fields):
     lab (not notebook)
     
     Inputs:
-        Archive (obj) : archive.Archive() object used to access
+        archive (obj) : archive.Archive() object used to access
             metadata fields via FindSource()
         keywords (list) : List of keyword arguments used for each
             chord, specified as strings. Argument used as the
@@ -35,21 +35,22 @@ def ChordChart(Archive, keywords, fields):
             used as 'fields' argument in FindSource()
     """
     # Check if Chord is available
-    if not cf.ChordAvailable:
+    try:
+        from chord import Chord
+    except ImportError:
         print("Function unavailable, requires installation of Chord")
-        print("See installation guide for auxilary packages")
+        print("Perform full setup for auxilary packages")
         return
-    from chord import Chord
     
     # Initialize matrix of intersection counts
     matrix = np.zeros((len(keywords),len(keywords)))
 
     # Loop through and find intersection counts
     for ii, name_A in enumerate(keywords):
-        A = Archive.FindSource([name_A], fields)
+        A = archive.FindSource([name_A], fields)
         for jj, name_B in enumerate(keywords):
             if jj > ii:
-                B = Archive.FindSource([name_B], fields)
+                B = archive.FindSource([name_B], fields)
                 matrix[ii, jj] = len(tools.IntersectLists([A, B]))
 
     # Make symmetric:
@@ -60,7 +61,7 @@ def ChordChart(Archive, keywords, fields):
     return
 
 
-def Heatmap1(Archive, field, N=20, cmap='CMRmap',
+def Heatmap1(archive, field, N=20, cmap='CMRmap',
              exclude=None, include=None):
     """
     For the top N keywords in field, plot a heatmap showing the
@@ -70,7 +71,7 @@ def Heatmap1(Archive, field, N=20, cmap='CMRmap',
     Differs from Heatmap2, which looks for connections BETWEEN fields.
     
     Inputs:
-        Archive (obj) : archive.Archive() object used to access
+        archive (obj) : archive.Archive() object used to access
             metadata fields via FindSource()
         field (str) : Field in which to look for keywords
         N (int) : Number of entries to show on the chart
@@ -81,7 +82,7 @@ def Heatmap1(Archive, field, N=20, cmap='CMRmap',
             specifically include in the plot
     """
     # Get top entries in field
-    data = Archive.GrabData(None, [field])
+    data = archive.GrabData(None, [field])
     data = tools.CountUnique(data[field], delimiter=', ')
     x = data['Entry'].tolist()
 
@@ -98,10 +99,10 @@ def Heatmap1(Archive, field, N=20, cmap='CMRmap',
 
     # Loop through and find intersection counts
     for ii, name_A in enumerate(keywords):
-        A = Archive.FindSource([name_A], [field])
+        A = archive.FindSource([name_A], [field])
         for jj, name_B in enumerate(keywords):
             if jj > ii:
-                B = Archive.FindSource([name_B], [field])
+                B = archive.FindSource([name_B], [field])
                 AB = tools.IntersectLists([A, B])
                 matrix[ii, jj] = len(AB)/(len(A)+len(B)-len(AB))
 
@@ -121,7 +122,7 @@ def Heatmap1(Archive, field, N=20, cmap='CMRmap',
     return
 
 
-def Heatmap2(Archive, field_x, field_y, 
+def Heatmap2(archive, field_x, field_y, 
              N_x=20, N_y=20, cmap='CMRmap',
              exclude_x=None, exclude_y=None, 
              include_x=None, include_y=None):
@@ -133,7 +134,7 @@ def Heatmap2(Archive, field_x, field_y,
     Differs from Heatmap2, which looks for connections BETWEEN fields.
     
     Inputs:
-        Archive (obj) : archive.Archive() object used to access
+        archive (obj) : archive.Archive() object used to access
             metadata fields via FindSource()
         field (str) : Field in which to look for keywords
         N (int) : Number of entries to show on the chart
@@ -144,10 +145,10 @@ def Heatmap2(Archive, field_x, field_y,
             specifically include in the plot
     """
     # Get top entries in each field
-    data = Archive.GrabData(None, [field_x])
+    data = archive.GrabData(None, [field_x])
     data = tools.CountUnique(data[field_x], delimiter=', ')
     x = data['Entry'].tolist()
-    data = Archive.GrabData(None, [field_y])
+    data = archive.GrabData(None, [field_y])
     data = tools.CountUnique(data[field_y], delimiter=', ')
     y = data['Entry'].tolist()
 
@@ -170,9 +171,9 @@ def Heatmap2(Archive, field_x, field_y,
 
     # Loop through and find intersection counts
     for ii, name_A in enumerate(keywords_x):
-        A = Archive.FindSource([name_A], [field_x])
+        A = archive.FindSource([name_A], [field_x])
         for jj, name_B in enumerate(keywords_y):
-            B = Archive.FindSource([name_B], [field_y])
+            B = archive.FindSource([name_B], [field_y])
             AB = tools.IntersectLists([A, B])
             matrix[ii, jj] = len(AB)/(len(A)+len(B)-len(AB))
 

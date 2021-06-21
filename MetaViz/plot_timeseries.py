@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from . import config as cf
+# import seaborn as sns
 
 #--------------------------------------
 # Time-Series Plots
@@ -24,7 +24,7 @@ def OccurancePlot(archive,
     plot of vertical lines
     
     Inputs:
-        archive (obj) : MetaViz.Archive object
+        archive (obj) : archive.Archive() object
         searchterms (list) : Terms for which to search.
         fields (list) : Metadata fields in which to look.
                 Shorthand expected. Default searches through
@@ -73,7 +73,7 @@ def OccuranceMagnitude(archive,
     of appearances that day
     
     Inputs:
-        archive (obj) : MetaViz.Archive object
+        archive (obj) : archive.Archive() object
         searchterms (list) : Terms for which to search.
         fields (list) : Metadata fields in which to look.
                 Shorthand expected. Default searches through
@@ -126,7 +126,7 @@ def ViolinPlot(archive, terms, fields,
     are aesthetic adjustments fed into seaborn.violinplots()
     
     Inputs:
-        archive (obj) : MetaViz.Archive object
+        archive (obj) : archive.Archive() object
         terms (list) : Keywords to search for in Archive, fed into
             Archive.FindSource()
         fields (list) : Exif fields in which to search for terms,
@@ -142,11 +142,12 @@ def ViolinPlot(archive, terms, fields,
             for seaborn.violinplot()
     """
     # Check if Seaborn is available
-    if not cf.SeabornAvailable:
+    try:
+        import seaborn as sns
+    except ImportError:
         print("Function unavailable, requires installation of Seaborn")
-        print("See installation guide for auxilary packages")
+        print("Perform full setup for auxilary packages")
         return
-    import seaborn as sns
     sns.set_theme(style="whitegrid")
 
     dates = []
@@ -186,7 +187,7 @@ def RidgePlot(archive, terms, fields,
     https://seaborn.pydata.org/examples/kde_ridgeplot.html
     
     Inputs:
-        archive (obj) : MetaViz.Archive object
+        archive (obj) : archive.Archive() object
         terms (list) : Keywords to search for in Archive, fed into
             Archive.FindSource()
         fields (list) : Exif fields in which to search for terms,
@@ -204,11 +205,12 @@ def RidgePlot(archive, terms, fields,
         height (float) : height of each FacetGrid
     """
     # Check if Seaborn is available
-    if not cf.SeabornAvailable:
+    try:
+        import seaborn as sns
+    except ImportError:
         print("Function unavailable, requires installation of Seaborn")
-        print("See installation guide for auxilary packages")
+        print("Perform full setup for auxilary packages")
         return
-    import seaborn as sns
     sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 
     dates = []

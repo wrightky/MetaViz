@@ -7,7 +7,6 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 # from PIL import Image
-from . import config as cf
 
 #--------------------------------------
 # Image Plots
@@ -49,11 +48,12 @@ def ShowThumbnails(files, res=64, showTitle=True, size='x-small'):
             to be string recognized by matplotlib function ax.set_text()
     """
     # Check if Chord is available
-    if not cf.PillowAvailable:
+    try:
+        from PIL import Image
+    except ImportError:
         print("Function unavailable, requires installation of Pillow")
-        print("See installation guide for auxilary packages")
+        print("Perform full setup for auxilary packages")
         return
-    from PIL import Image
     
     titles = [os.path.basename(m).split('.')[0] for m in files]
 
