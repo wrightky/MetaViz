@@ -330,5 +330,17 @@ def TotalDuration(series, field='Duration'):
     series = series[series[field].notnull()]
     # Convert to timedelta and add up
     dur = str(pd.to_timedelta(series[field]).sum())
-    print(dur)
     return dur
+
+
+def CountFiles(path):
+    """
+    Count the number of files recursively inside path
+
+    Inputs:
+        path (str) : Parent directory in which to count files
+    Outputs:
+        file_count (int) : Number of files in path
+    """
+    file_count = sum(len(files) for _, _, files in os.walk(path))
+    return file_count
