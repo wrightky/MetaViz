@@ -224,7 +224,7 @@ def StitchPanorama(images, outfile, mode=1):
     return
 
 
-def Coverage2Coords(archive, geolocator, min_delay_seconds=2):
+def Coverage2Coords(csvPath, geolocator, min_delay_seconds=2):
     """
     Using GeoPy geolocator, try to convert Location names in
     the Coverage field to lat/long coordinates. Requires that
@@ -240,8 +240,7 @@ def Coverage2Coords(archive, geolocator, min_delay_seconds=2):
     (e.g. set min_delay_seconds accordingly)
     
     Inputs:
-        archive (obj) : archive.Archive() object used to access
-            csv files
+        csvPath (str) : Path to metadata CSV files
         geolocator (obj) : A geolocator instance of one of
             the classes inside geopy.geocoders, such as
             OpenMapQuest(api_key = 'user_api_key_here')
@@ -266,7 +265,7 @@ def Coverage2Coords(archive, geolocator, min_delay_seconds=2):
                           min_delay_seconds=min_delay_seconds)
     
     # Load in csv of coverage
-    csvname = os.path.join(archive.csvPath, 'LocationCoords.csv')
+    csvname = os.path.join(csvPath, 'LocationCoords.csv')
     if not os.path.exists(csvname):
         print('Error: Archive.DownloadCoverage() must be run '+\
               'before calling this function. Exiting')
@@ -313,3 +312,23 @@ def Coverage2Coords(archive, geolocator, min_delay_seconds=2):
     # Save csv
     df.to_csv(csvname, index=False, encoding="ISO-8859-1")
     return
+
+
+def TotalDuration(series, field='Duration'):
+    """
+    Find total duration of all video viles from a Pandas series
+    containing duration information in specified field.
+
+    Inputs:
+        series (pandas series) : DataFrame or Series containing
+            duration information
+        field (str) : Field name in series containing duration information
+    Outputs:
+        dur (str) : Total duration length for all files in series
+    """
+    # Eliminate NaN durations
+    series = series[series[field].notnull()]
+    # Convert to timedelta and add up
+    dur = str(pd.to_timedelta(series[field]).sum())
+    print(dur)
+    return dur
