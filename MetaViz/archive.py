@@ -317,8 +317,9 @@ class Archive():
             df = df[df['SourceFile'].str.contains(sourcefiles)]
 
         # Make sure dates are recognizable as datetime
-        df['CreateDate'] = pd.to_datetime(df['CreateDate'],
-                                          format='%Y:%m:%d %H:%M:%S')
+        df['CreateDate'] = pd.to_datetime(
+                               df['CreateDate'].str.split('.',1).str[0],
+                               format='%Y:%m:%d %H:%M:%S')
         # If filtering by date bounds:
         if startdate is not None:
             startdate = pd.to_datetime(startdate, format="%Y%m%d_%H%M%S")
@@ -352,6 +353,7 @@ class Archive():
     def DownloadCoverage(self, delimiter=', ',
                          overwrite_existing=False):
         """
+        ~~~GEOSPATIAL FUNCTIONS STILL IN BETA~~~
         Function will save a 'LocationCoords.csv' file in the
         metadata repository based on the Coverage field for use
         with the geospatial plotting routines.

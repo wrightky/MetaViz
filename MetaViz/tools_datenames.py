@@ -32,7 +32,7 @@ def Dates2Names(folder, dt_format='%Y%m%d_%H%M%S',
 
 def Names2Dates(csvName,
                 datefields=['CreateDate','FileModifyDate'],
-                dt_format = '%Y%m%d_%H%M%S'):
+                dt_format = '%Y%m%d_%H%M%S', numChar=15):
     """
     Function to update the csv metadata date fields using
     the date specified in the filename. Note that function
@@ -45,6 +45,7 @@ def Names2Dates(csvName,
             fields to update
         dt_format (str) : Datetime format matching oldDates, given
             as one of the formats recognized by pandas.to_datetime()
+        numChar (int) : Number of date characters in dt_format
     """
     # Using pandas on a previous exiftool call
     df = pd.read_csv(csvName, encoding="ISO-8859-1")
@@ -53,7 +54,7 @@ def Names2Dates(csvName,
     fileNames = df['SourceFile'].values.tolist()
     # Make sure to eliminate path and extensions
     fileNames = [f.split(os.sep)[-1] for f in fileNames]
-    fileNames = [f.split('.')[0] for f in fileNames]
+    fileNames = [f.split('.')[0][0:numChar] for f in fileNames]
     
     # Use pandas to auto-reformat date
     df2 = pd.DataFrame()

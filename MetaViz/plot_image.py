@@ -47,7 +47,7 @@ def ShowThumbnails(files, res=64, showTitle=True, size='x-small'):
         size (str) : Text size to be used if showTitle==True, needs
             to be string recognized by matplotlib function ax.set_text()
     """
-    # Check if Chord is available
+    # Check if pillow is available
     try:
         from PIL import Image
     except ImportError:

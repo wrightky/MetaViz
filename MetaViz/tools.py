@@ -224,8 +224,41 @@ def StitchPanorama(images, outfile, mode=1):
     return
 
 
+def TotalDuration(series, field='Duration'):
+    """
+    Find total duration of all video viles from a Pandas series
+    containing duration information in specified field.
+
+    Inputs:
+        series (pandas series) : DataFrame or Series containing
+            duration information
+        field (str) : Field name in series containing duration information
+    Outputs:
+        dur (str) : Total duration length for all files in series
+    """
+    # Eliminate NaN durations
+    series = series[series[field].notnull()]
+    # Convert to timedelta and add up
+    dur = str(pd.to_timedelta(series[field]).sum())
+    return dur
+
+
+def CountFiles(path):
+    """
+    Count the number of files recursively inside path
+
+    Inputs:
+        path (str) : Parent directory in which to count files
+    Outputs:
+        file_count (int) : Number of files in path
+    """
+    file_count = sum(len(files) for _, _, files in os.walk(path))
+    return file_count
+
+
 def Coverage2Coords(csvPath, geolocator, min_delay_seconds=2):
     """
+    ~~~GEOSPATIAL FUNCTIONS STILL IN BETA~~~
     Using GeoPy geolocator, try to convert Location names in
     the Coverage field to lat/long coordinates. Requires that
     Archive.DownloadCoverage() has been called prior to this
@@ -312,35 +345,3 @@ def Coverage2Coords(csvPath, geolocator, min_delay_seconds=2):
     # Save csv
     df.to_csv(csvname, index=False, encoding="ISO-8859-1")
     return
-
-
-def TotalDuration(series, field='Duration'):
-    """
-    Find total duration of all video viles from a Pandas series
-    containing duration information in specified field.
-
-    Inputs:
-        series (pandas series) : DataFrame or Series containing
-            duration information
-        field (str) : Field name in series containing duration information
-    Outputs:
-        dur (str) : Total duration length for all files in series
-    """
-    # Eliminate NaN durations
-    series = series[series[field].notnull()]
-    # Convert to timedelta and add up
-    dur = str(pd.to_timedelta(series[field]).sum())
-    return dur
-
-
-def CountFiles(path):
-    """
-    Count the number of files recursively inside path
-
-    Inputs:
-        path (str) : Parent directory in which to count files
-    Outputs:
-        file_count (int) : Number of files in path
-    """
-    file_count = sum(len(files) for _, _, files in os.walk(path))
-    return file_count
