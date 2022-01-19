@@ -16,16 +16,16 @@ We try to keep these functions quick by minimizing our calls to exiftool, which 
 Examples of these visualizations can be seen below and in the [gallery](https://github.com/wrightky/MetaViz/tree/main/gallery) folder.
 
 <p float="left">
-  <img src="gallery/BarChart.png" width="200" />
-  <img src="gallery/Heatmap1.png" width="200" /> 
-  <img src="gallery/ChordChart.png" width="200" />
+  <img src="gallery/BarChart.png" width="400" />
+  <img src="gallery/Heatmap1.png" width="400" /> 
+  <img src="gallery/ChordChart.png" width="400" />
 </p>
 <p float="left">
-  <img src="gallery/TemporalStats.png" width="300" />
-  <img src="gallery/ViolinPlot.png" width="300" /> 
+  <img src="gallery/TemporalStats.png" width="400" />
+  <img src="gallery/ViolinPlot.png" width="700" /> 
 </p>
 <p float="left">
-  <img src="gallery/OccuranceMagnitude.png" width="600" />
+  <img src="gallery/OccuranceMagnitude.png" width="1000" />
 </p>
 
 ## Installation
