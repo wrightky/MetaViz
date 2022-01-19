@@ -12,6 +12,8 @@ Codes and tools in this repository are all built in Python -- however, to access
 
 We try to keep these functions quick by minimizing our calls to exiftool, which can be computationally expensive for large media collections. To do this, we use exiftool to save all the metadata information for your library into a *'metadatabase'* of `.csv` files, and then use [`Pandas`](https://pandas.pydata.org/docs/index.html) to directly access and process that information in Python. To create figures and visualizations, we require at minumum an installation of [`matplotlib`](https://matplotlib.org/stable/index.html), with many optional plotting routines that make use of other popular libraries like [`seaborn`](https://seaborn.pydata.org/index.html) and [`Pillow`](https://pillow.readthedocs.io/en/stable/index.html). Our goal is that the aesthetic adjustments made behind the scenes in the plotting routines will provide nice, good-looking visualizations right out of the box -- or, at minimum, example functions that can be used as starting points to make your own.
 
+Note that any geospatial plotting functions are currently in beta.
+
 ## Example Figures
 Examples of these visualizations can be seen below and in the [gallery](https://github.com/wrightky/MetaViz/tree/main/gallery) folder.
 
