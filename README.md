@@ -1,4 +1,6 @@
-![](https://raw.githubusercontent.com/wrightky/MetaViz/main/gallery/banner.gif?token=AHMFST7LQZORXG5QQR633J3ALEJBY)
+<p float="left">
+  <img src="gallery/banner.gif" width="600" />
+</p>
 
 # MetaViz - Media Metadata Visualization Library
 **Repository of tools to interface with, visualize, and edit the metadata information in a collection or archive of visual media (i.e. photos and videos).**
@@ -14,16 +16,16 @@ We try to keep these functions quick by minimizing our calls to exiftool, which 
 Examples of these visualizations can be seen below and in the [gallery](https://github.com/wrightky/MetaViz/tree/main/gallery) folder.
 
 <p float="left">
-  <img src="gallery/BarChart.png" width="100" />
-  <img src="gallery/Heatmap1.png" width="100" /> 
-  <img src="gallery/ChordChart.png" width="100" />
+  <img src="gallery/BarChart.png" width="200" />
+  <img src="gallery/Heatmap1.png" width="200" /> 
+  <img src="gallery/ChordChart.png" width="200" />
 </p>
 <p float="left">
-  <img src="gallery/TemporalStats.png" width="100" />
-  <img src="gallery/ViolinPlot.png" width="100" /> 
+  <img src="gallery/TemporalStats.png" width="300" />
+  <img src="gallery/ViolinPlot.png" width="300" /> 
 </p>
 <p float="left">
-  <img src="gallery/OccuranceMagnitude.png" width="100" />
+  <img src="gallery/OccuranceMagnitude.png" width="600" />
 </p>
 
 ## Installation
