@@ -21,8 +21,8 @@ Examples of these visualizations can be seen below and in the [gallery](https://
   <img src="gallery/ChordChart.png" width="300" />
 </p>
 <p float="left">
-  <img src="gallery/TemporalStats.png" width="300" />
-  <img src="gallery/ViolinPlot.png" width="600" /> 
+  <img src="gallery/TemporalStats.png" width="400" />
+  <img src="gallery/ViolinPlot.png" width="500" /> 
 </p>
 <p float="left">
   <img src="gallery/OccuranceMagnitude.png" width="800" />
