@@ -37,6 +37,11 @@ MetaViz has been tested in Python 3.6+, and should work in any version of Python
 - [`chord`](https://pypi.org/project/chord/) (requires [`Jupyter Lab`](https://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html))
 - [`OpenCV`](https://pypi.org/project/opencv-python/)
 
+## Authors
+This package is just a personal project developed at home in our spare time.
+- **Kyle Wright** - Environmental Engineer, Ph.D. Student
+- **Mickey Lanning** - Archivist, M.S. Information Science
+
 ## Contributing
 
 We welcome contributions to the MetaViz project. Please open an issue or a pull request if there is functionality you would like to see or propose, and I will gladly try to help!
