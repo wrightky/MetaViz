@@ -1,4 +1,4 @@
-![banner](gallery/banner.gif)
+![banner](https://media0.giphy.com/media/OVrt0zRITS4jjPvxEi/giphy.gif)
 
 # MetaViz - Media Metadata Visualization Library
 **Repository of tools to interface with, visualize, and edit the metadata information in a collection or archive of visual media (i.e. photos and videos).**
