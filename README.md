@@ -29,7 +29,7 @@ Examples of these visualizations can be seen below and in the [gallery](https://
 </p>
 
 ## Installation
-MetaViz has been tested in Python 3.6+, and should work in any version of Python in which the underlying packages work. To install MetaViz, clone this repository using `git clone` and run `python setup.py install` from the cloned directory. **In order to use MetaViz, the local environment must include at minimum `numpy`, `Pandas`, and `matplotlib`, along with a functioning installation of [`exiftool`](https://exiftool.org/install.html)**. We also strongly recommend the use of [`Jupyter Lab`](https://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html). In order to use the full suite of tools and functions available, the optional packages we use for select functions are listed below. All links go to the relevant install page.
+MetaViz has been tested in Python 3.7+, and should work in any version of Python in which the underlying packages work. To install MetaViz, clone this repository using `git clone` and run `python setup.py install` from the cloned directory. **In order to use MetaViz, the local environment must include at minimum `numpy`, `Pandas`, and `matplotlib`, along with a functioning installation of [`exiftool`](https://exiftool.org/install.html)**. We also strongly recommend the use of [`Jupyter Lab`](https://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html). In order to use the full suite of tools and functions available, the optional packages we use for select functions are listed below. All links go to the relevant install page.
 
 ### Optional Packages:
 - [`seaborn`](https://seaborn.pydata.org/installing.html)
