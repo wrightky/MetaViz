@@ -1,6 +1,4 @@
-<p float="left">
-  <img src="gallery/banner.gif" width="600" />
-</p>
+![banner]("gallery/banner.gif")
 
 # MetaViz - Media Metadata Visualization Library
 **Repository of tools to interface with, visualize, and edit the metadata information in a collection or archive of visual media (i.e. photos and videos).**
