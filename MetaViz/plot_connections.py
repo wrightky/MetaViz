@@ -127,22 +127,28 @@ def Heatmap2(archive, field_x, field_y,
              exclude_x=None, exclude_y=None, 
              include_x=None, include_y=None):
     """
-    For the top N keywords in field, plot a heatmap showing the
-    extent to which those keywords tend to appear along with
-    other keywords inside the SAME metadata field.
+    For the top N keywords in each field, plot a heatmap showing the
+    extent to which those keywords tend to appear along with other
+    keywords between DIFFERENT metadata field.
     
-    Differs from Heatmap2, which looks for connections BETWEEN fields.
+    Differs from Heatmap1, which looks for connections WITHIN fields.
     
     Inputs:
         archive (obj) : archive.Archive() object used to access
             metadata fields via FindSource()
-        field (str) : Field in which to look for keywords
-        N (int) : Number of entries to show on the chart
+        field_x (str) : First field in which to look for keywords
+        field_y (str) : Second field in which to look for keywords
+        N_x (int) : Number of entries to show for the first field
+        N_y (int) : Number of entries to show for the second field
         cmap (str) : Matplotlib colormap to be used for the heatmap
-        exclude (list or bool) : List of entries in data to
-            specifically exclude from the plot
-        include (list or bool) : List of entries in data to
-            specifically include in the plot
+        exclude_x (list or bool) : List of entries in data to
+            specifically exclude from the x-axis
+        exclude_y (list or bool) : List of entries in data to
+            specifically exclude from the y-axis
+        include_x (list or bool) : List of entries in data to
+            specifically include on the x-axis
+        include_y (list or bool) : List of entries in data to
+            specifically include on the y-axis
     """
     # Get top entries in each field
     data = archive.GrabData(None, [field_x])
